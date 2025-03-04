@@ -1,76 +1,48 @@
 package org.example;
 
-// 문제 : 실행되는 출력문에는 참 그렇지 않으면 거짓 이라고 적어주세요.
+import java.io.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
-class Main {
+public class Main {
+
+    static AtomicInteger age = new AtomicInteger();
+    static int askCnt = 0;
+
     public static void main(String[] args) {
-        if ( true ) {
-            System.out.println("참");
+        try(
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out))
+        ) {
+            bw.write("당신의 나이를 입력해주세요.\n");
+            bw.flush();
+            askYourAge(br, bw);
+            if(askCnt >= 3) {
+                bw.write(String.format("올바른 나이를 %d회 입력하지 않아 프로그램을 종료함.", askCnt));
+                bw.flush();
+                return;
+            }
+            int iAge = age.get();
+            if      (iAge >=  0 && iAge < 10) bw.write("유아/아동\n");
+            else if (iAge >= 10 && iAge < 20) bw.write("10대\n");
+            else if (iAge >= 20 && iAge < 30) bw.write("20대\n");
+            else if (iAge >= 30 && iAge < 40) bw.write("30대\n");
+            else if (iAge >= 40)              bw.write("40대 이상\n");
+            bw.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        if ( false ) {
-            System.out.println("거짓");
-        }
-
-        int a = 10;
-
-        // `==` => 같다.
-        if ( a == 10 ) {
-            System.out.println("t1");
-        }
-
-        // `!=` => 같지 않다.
-        if ( a != 10 ) {
-            System.out.println("f1");
-        }
-
-        if ( a > 10 ) {
-            System.out.println("f2");
-        }
-
-        if ( a >= 10 ) {
-            System.out.println("t2");
-        }
-
-        int b = 10;
-
-        if ( a == b ) {
-            System.out.println("t3");
-        }
-
-        // boolean c => c 에는 오직 true/false 만 담을 수 있다.
-        boolean c = a != b;
-
-        if ( c ) {
-            System.out.println("f3");
-        }
-
-        if ( c == false ) {
-            System.out.println("t4");
-        }
-
-        // `!` => 반전
-        if ( !c ) {
-            System.out.println("t5");
-        }
-
-        // `!` => 반전
-        if ( !(!c) ) {
-            System.out.println("f4");
-        }
-
-        boolean d = true;
-
-        if ( c != d ) {
-            System.out.println("t6");
-        }
-
-        if ( 20 > 2 && 10 > 3 && true != false && 10 != 10 ) {
-            System.out.println("f5");
-        }
-
-        if ( 10 != 10 || 10 < 2 ) {
-            System.out.println("f6");
+    private static void askYourAge(BufferedReader br, BufferedWriter bw) throws IOException {
+        try {
+            int inputAge = Integer.parseInt(br.readLine());
+            age.set(inputAge);
+            if(askCnt > 0) askCnt = 0;
+        } catch(NumberFormatException nfe) {
+            if(++askCnt >= 3) return;
+            bw.write("올바른 나이를 입력하시오.\n");
+            bw.flush();
+            askYourAge(br, bw);
         }
     }
 }
